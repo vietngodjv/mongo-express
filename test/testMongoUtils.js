@@ -11,7 +11,6 @@ export const testData = [
 ];
 
 let mongod;
-let mongoauthd;
 let currentTestData;
 export const getCurrentTestData = () => currentTestData;
 export const getFirstDocumentId = () => getCurrentTestData()[0]._id.toString();
@@ -24,21 +23,6 @@ export const createConnection = async () => {
   if (!mongod) {
     mongod = await MongoMemoryServer.create();
     mongoConfig.setUri(mongod.getUri());
-  }
-
-  return MongoClient.connect(mongoConfig.makeConnectionUrl());
-};
-
-export const createConnectionWithWrongAuth = async () => {
-  if (!mongoauthd) {
-    mongoauthd = await MongoMemoryServer.create({
-      auth: {
-        enable: true, // enable automatic user creation
-        customRootName: 'adm', // by default "mongodb-memory-server-root"
-        customRootPwd: 'pass',
-      },
-    });
-    mongoConfig.setUri(mongoauthd.getUri());
   }
 
   return MongoClient.connect(mongoConfig.makeConnectionUrl());
@@ -68,6 +52,5 @@ export const closeDb = (client) => client.close();
 export const initializeDb = () => createConnection()
   .then((client) => createTestCollection(client).then(() => client));
 
-export const initializeDbWithWrongAuth = () => createConnectionWithWrongAuth();
 export const cleanAndCloseDb = (client) => dropTestCollection(client)
   .then(() => closeDb(client));

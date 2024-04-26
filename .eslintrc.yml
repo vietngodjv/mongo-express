@@ -40,7 +40,7 @@ rules:
     - devDependencies:
       - '**/test/**/*.js'
       - '**/scripts/*.js'
-      - '**/webpack.config.mjs'
+      - '**/webpack.config.js'
 
   lodash/callback-binding: error
   lodash/collection-method-value: error
@@ -57,7 +57,9 @@ rules:
   unicorn/no-null: off
   unicorn/no-unsafe-regex: off
   unicorn/numeric-separators-style: off
+  unicorn/prefer-at: off  # missing at function in Node v14
   unicorn/prefer-export-from: off
+  unicorn/prefer-string-replace-all: off  # missing replaceAll function in Node v14
   unicorn/prevent-abbreviations: off
 
   # To be turned on

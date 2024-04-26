@@ -1,6 +1,6 @@
 import mongoConfig from './testMongoConfig.js';
 
-const bsonSpec = () => ({
+export default () => ({
   mongodb: {
     connectionString: mongoConfig.makeConnectionUrl(),
 
@@ -28,9 +28,9 @@ const bsonSpec = () => ({
 
   options: {
     documentsPerPage: 10,
+    editorTheme: 'rubyblue',
+
     logger: { skip: () => true },
     readOnly: false,
   },
 });
-
-export default bsonSpec;

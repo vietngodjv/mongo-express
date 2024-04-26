@@ -25,9 +25,7 @@ describe('Router collection', () => {
       .get(`/db/${dbName}/${urlColName}`).expect(200)
       .then((res) => {
         expect(res.text).to.match(new RegExp(`<title>${collectionName} - Mongo Express</title>`));
-        expect(res.text).to.match(new RegExp(
-          `<h1 id="pageTitle" class="pb-2 border-bottom border-dark">Viewing Collection: ${collectionName}</h1>`,
-        ));
+        expect(res.text).to.match(new RegExp(`<h1 id="pageTitle">Viewing Collection: ${collectionName}</h1>`));
         expect(htmlParser.parse(res.text).querySelectorAll('[id^="doc-"]').length).to.equal(4);
       }));
 
@@ -35,7 +33,7 @@ describe('Router collection', () => {
       .get(`/db/${dbName}/${urlColName}`).expect(200).query({ query: '{testItem:1}' })
       .then((res) => {
         expect(res.text).to.match(new RegExp(`<title>${collectionName} - Mongo Express</title>`));
-        expect(res.text).to.match(new RegExp(`<h1 id="pageTitle" class="pb-2 border-bottom border-dark">Viewing Collection: ${collectionName}</h1>`));
+        expect(res.text).to.match(new RegExp(`<h1 id="pageTitle">Viewing Collection: ${collectionName}</h1>`));
         expect(htmlParser.parse(res.text).querySelectorAll('[id^="doc-"]').length).to.equal(1);
       }));
 
@@ -44,9 +42,7 @@ describe('Router collection', () => {
         .get(`/db/${dbName}/${urlColName}`).expect(200).query({ runAggregate: 'on', query: '' })
         .then((res) => {
           expect(res.text).to.match(new RegExp(`<title>${collectionName} - Mongo Express</title>`));
-          expect(res.text).to.match(new RegExp(
-            `<h1 id="pageTitle" class="pb-2 border-bottom border-dark">Viewing Collection: ${collectionName}</h1>`,
-          ));
+          expect(res.text).to.match(new RegExp(`<h1 id="pageTitle">Viewing Collection: ${collectionName}</h1>`));
           expect(htmlParser.parse(res.text).querySelectorAll('[id^="doc-"]').length).to.equal(4);
         }));
 
@@ -54,9 +50,7 @@ describe('Router collection', () => {
         .get(`/db/${dbName}/${urlColName}`).expect(200).query({ runAggregate: 'on', query: '[]' })
         .then((res) => {
           expect(res.text).to.match(new RegExp(`<title>${collectionName} - Mongo Express</title>`));
-          expect(res.text).to.match(new RegExp(
-            `<h1 id="pageTitle" class="pb-2 border-bottom border-dark">Viewing Collection: ${collectionName}</h1>`,
-          ));
+          expect(res.text).to.match(new RegExp(`<h1 id="pageTitle">Viewing Collection: ${collectionName}</h1>`));
           expect(htmlParser.parse(res.text).querySelectorAll('[id^="doc-"]').length).to.equal(4);
         }));
 
@@ -64,9 +58,7 @@ describe('Router collection', () => {
         .get(`/db/${dbName}/${urlColName}`).expect(200).query({ runAggregate: 'on', query: '[{$match:{testItem:1}}]' })
         .then((res) => {
           expect(res.text).to.match(new RegExp(`<title>${collectionName} - Mongo Express</title>`));
-          expect(res.text).to.match(new RegExp(
-            `<h1 id="pageTitle" class="pb-2 border-bottom border-dark">Viewing Collection: ${collectionName}</h1>`,
-          ));
+          expect(res.text).to.match(new RegExp(`<h1 id="pageTitle">Viewing Collection: ${collectionName}</h1>`));
           expect(htmlParser.parse(res.text).querySelectorAll('[id^="doc-"]').length).to.equal(1);
         }));
     });
