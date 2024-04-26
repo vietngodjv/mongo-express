@@ -11,8 +11,10 @@ FROM node:18-alpine3.16
 
 # "localhost" doesn't mean much in a container, so we adjust our default to the common service name "mongo" instead
 # (and make sure the server listens outside the container, since "localhost" inside the container is usually difficult to access)
-ENV ME_CONFIG_MONGODB_URL="mongodb://mongo:27017"
-ENV ME_CONFIG_MONGODB_ENABLE_ADMIN="true"
+ENV ME_CONFIG_MONGODB_URL="mongodb://host.docker.internal:27017"
+ENV ME_CONFIG_MONGODB_ENABLE_ADMIN="false"
+ENV ME_CONFIG_SITE_COOKIESECRET="cookiesecret"
+ENV ME_CONFIG_SITE_SESSIONSECRET="sessionsecret"
 ENV VCAP_APP_HOST="0.0.0.0"
 
 WORKDIR /opt/mongo-express
