@@ -1,73 +1,45 @@
-import { MongoClient } from 'mongodb';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+'use strict';
 
-import mongoConfig from './testMongoConfig.js';
+const MongoClient = require('mongodb').MongoClient;
 
-export const testData = [
+const mongoConfig = require('./testMongoConfig');
+const asPromise = require('./testUtils').asPromise;
+
+exports.testData = [
   { testItem: 1 },
   { testItem: 2 },
   { testItem: 3 },
   { testItem: 4 },
 ];
 
-let mongod;
-let mongoauthd;
 let currentTestData;
-export const getCurrentTestData = () => currentTestData;
-export const getFirstDocumentId = () => getCurrentTestData()[0]._id.toString();
+exports.getCurrentTestData = () => currentTestData;
+exports.getFirstDocumentId = () => exports.getCurrentTestData()[0]._id.toString();
 
-export const testCollectionName = 'test/items';
-export const testDbName = mongoConfig.dbName;
-export const testURLCollectionName = encodeURIComponent(testCollectionName);
+exports.testCollectionName = 'test/items';
+exports.testDbName = mongoConfig.dbName;
+exports.testURLCollectionName = encodeURIComponent(exports.testCollectionName);
 
-export const createConnection = async () => {
-  if (!mongod) {
-    mongod = await MongoMemoryServer.create();
-    mongoConfig.setUri(mongod.getUri());
-  }
+exports.createConnection = () =>
+  asPromise(cb => MongoClient.connect(mongoConfig.makeConnectionUrl(), cb));
 
-  return MongoClient.connect(mongoConfig.makeConnectionUrl());
-};
-
-export const createConnectionWithWrongAuth = async () => {
-  if (!mongoauthd) {
-    mongoauthd = await MongoMemoryServer.create({
-      auth: {
-        enable: true, // enable automatic user creation
-        customRootName: 'adm', // by default "mongodb-memory-server-root"
-        customRootPwd: 'pass',
-      },
+exports.createTestCollection = client =>
+  asPromise(cb => client.db().collection(exports.testCollectionName).insertMany(exports.testData, cb))
+    .then((results) => {
+      currentTestData = results.ops;
+      return results;
     });
-    mongoConfig.setUri(mongoauthd.getUri());
-  }
 
-  return MongoClient.connect(mongoConfig.makeConnectionUrl());
-};
+exports.dropTestCollection = client =>
+  asPromise(cb => client.db().collection(exports.testCollectionName).drop(cb));
 
-export const createTestCollection = async (client) => {
-  const insertResults = await client.db().collection(testCollectionName).insertMany(testData);
-  const ids = Object.values(insertResults.insertedIds);
-  const results = await client.db().collection(testCollectionName).find({ _id: { $in: ids } }).toArray();
-  currentTestData = results;
+exports.closeDb = client =>
+  asPromise(cb => client.close(cb));
 
-  return results;
-};
+exports.initializeDb = () =>
+  exports.createConnection().then(client =>
+    exports.createTestCollection(client).then(() => client)
+  );
 
-/** @typedef {import('mongodb').MongoClient} MongoClient */
-
-/**
- * Return collection instance
- * @param {MongoClient} client
- */
-export const testCollection = (client) => client.db().collection(testCollectionName);
-
-export const dropTestCollection = (client) => client.db().collection(testCollectionName).drop();
-
-export const closeDb = (client) => client.close();
-
-export const initializeDb = () => createConnection()
-  .then((client) => createTestCollection(client).then(() => client));
-
-export const initializeDbWithWrongAuth = () => createConnectionWithWrongAuth();
-export const cleanAndCloseDb = (client) => dropTestCollection(client)
-  .then(() => closeDb(client));
+exports.cleanAndCloseDb = client =>
+  exports.dropTestCollection(client).then(() => exports.closeDb(client));
