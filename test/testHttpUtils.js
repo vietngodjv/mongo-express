@@ -1,14 +1,19 @@
-import supertest from 'supertest';
+'use strict';
 
-import defaultConf from './testDefaultConfig.js';
-import middleware from '../lib/middleware.js';
+const supertest = require('supertest');
 
-export const createServer = async () => {
-  const app = await middleware(defaultConf());
+const defaultConf = require('./testDefaultConfig');
+const testUtils = require('./testUtils');
+const middleware = require('../lib/middleware');
+
+exports.createServer = () => {
+  const app = middleware(defaultConf());
   const httpServer = app.listen();
   const request = supertest.agent(httpServer);
-
-  return ({ request, close: () => httpServer.close() });
+  // There is currently a race condition with collection registering to mongoDb.
+  // @TODO fix the race condition and remove me
+  return testUtils.timeoutPromise(50)
+    .then(() =>  ({ request, close: () => testUtils.asPromise(cb => httpServer.close(cb)) }));
 };
 
-export const getDocumentUrl = (db, collection, documentId) => `/db/${db}/${collection}/${JSON.stringify(documentId)}`;
+exports.getDocumentUrl = (db, collection, documentId) => `/db/${db}/${collection}/${JSON.stringify(documentId)}`;

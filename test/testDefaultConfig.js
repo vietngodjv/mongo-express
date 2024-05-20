@@ -1,10 +1,19 @@
-import mongoConfig from './testMongoConfig.js';
+'use strict';
 
-export default () => ({
+const mongoConfig = require('./testMongoConfig');
+
+module.exports = () => ({
   mongodb: {
-    connectionString: mongoConfig.makeConnectionUrl(),
+    server: mongoConfig.host,
+    port: mongoConfig.port,
 
+    autoReconnect: true,
+    poolSize: 4,
     admin: true,
+    auth: [],
+
+    adminUsername: '',
+    adminPassword: '',
     whitelist: [mongoConfig.dbName],
     blacklist: [],
   },
@@ -20,10 +29,6 @@ export default () => ({
     sslKey: '',
   },
 
-  healthCheck: {
-    path: '/status',
-  },
-
   useBasicAuth: false,
 
   options: {
@@ -33,4 +38,6 @@ export default () => ({
     logger: { skip: () => true },
     readOnly: false,
   },
+
+  defaultKeyNames: {},
 });

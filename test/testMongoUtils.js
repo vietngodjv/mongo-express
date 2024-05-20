@@ -1,56 +1,45 @@
-import { MongoClient } from 'mongodb';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+'use strict';
 
-import mongoConfig from './testMongoConfig.js';
+const MongoClient = require('mongodb').MongoClient;
 
-export const testData = [
+const mongoConfig = require('./testMongoConfig');
+const asPromise = require('./testUtils').asPromise;
+
+exports.testData = [
   { testItem: 1 },
   { testItem: 2 },
   { testItem: 3 },
   { testItem: 4 },
 ];
 
-let mongod;
 let currentTestData;
-export const getCurrentTestData = () => currentTestData;
-export const getFirstDocumentId = () => getCurrentTestData()[0]._id.toString();
+exports.getCurrentTestData = () => currentTestData;
+exports.getFirstDocumentId = () => exports.getCurrentTestData()[0]._id.toString();
 
-export const testCollectionName = 'test/items';
-export const testDbName = mongoConfig.dbName;
-export const testURLCollectionName = encodeURIComponent(testCollectionName);
+exports.testCollectionName = 'test/items';
+exports.testDbName = mongoConfig.dbName;
+exports.testURLCollectionName = encodeURIComponent(exports.testCollectionName);
 
-export const createConnection = async () => {
-  if (!mongod) {
-    mongod = await MongoMemoryServer.create();
-    mongoConfig.setUri(mongod.getUri());
-  }
+exports.createConnection = () =>
+  asPromise(cb => MongoClient.connect(mongoConfig.makeConnectionUrl(), cb));
 
-  return MongoClient.connect(mongoConfig.makeConnectionUrl());
-};
+exports.createTestCollection = db =>
+  asPromise(cb => db.collection(exports.testCollectionName).insertMany(exports.testData, cb))
+    .then((results) => {
+      currentTestData = results.ops;
+      return results;
+    });
 
-export const createTestCollection = async (client) => {
-  const insertResults = await client.db().collection(testCollectionName).insertMany(testData);
-  const ids = Object.values(insertResults.insertedIds);
-  const results = await client.db().collection(testCollectionName).find({ _id: { $in: ids } }).toArray();
-  currentTestData = results;
+exports.dropTestCollection = db =>
+  asPromise(cb => db.collection(exports.testCollectionName).drop(cb));
 
-  return results;
-};
+exports.closeDb = db =>
+  asPromise(cb => db.close(cb));
 
-/** @typedef {import('mongodb').MongoClient} MongoClient */
+exports.initializeDb = () =>
+  exports.createConnection().then(db =>
+    exports.createTestCollection(db).then(() => db)
+  );
 
-/**
- * Return collection instance
- * @param {MongoClient} client
- */
-export const testCollection = (client) => client.db().collection(testCollectionName);
-
-export const dropTestCollection = (client) => client.db().collection(testCollectionName).drop();
-
-export const closeDb = (client) => client.close();
-
-export const initializeDb = () => createConnection()
-  .then((client) => createTestCollection(client).then(() => client));
-
-export const cleanAndCloseDb = (client) => dropTestCollection(client)
-  .then(() => closeDb(client));
+exports.cleanAndCloseDb = db =>
+  exports.dropTestCollection(db).then(() => exports.closeDb(db));

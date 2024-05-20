@@ -44,7 +44,7 @@
       </a>
     </td>
     <td><h3><a href="{{ baseHref }}db/{{ db | url_encode }}/">{{ db }}</a></h3></td>
-    {% if !settings.read_only && !settings.no_delete %}
+    {% if !settings.read_only %}
     <td class="col-md-2">
       <form method="POST" action="{{ baseHref }}{{ db | url_encode }}" style="margin: 0px;">
         <input type="hidden" name="_method" value="delete">
@@ -60,7 +60,7 @@
 </table>
 </div>
   </div>
-{% if !settings.read_only && !settings.no_delete %}
+{% if !settings.read_only %}
 <div id="confirm-deletion" class="modal fade" role="dialog" aria-labelledby="confirmDeletionLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -122,14 +122,8 @@
   <tr>
     <td><strong>Uptime</strong></td>
     <td>{{ info.uptime }} seconds {% if info.uptime > 86400 %} ({{ Math.floor( info.uptime/86400 ) }} days) {% endif %}</td>
-    <td class="span2"><strong>Node Version</strong></td>
-    <td class="span3" id="nodeVersion">{{ process.versions.node }}</td>
-  </tr>
-  <tr>
     <td><strong>Server Time</strong></td>
     <td>{{ info.localTime|date('r') }}</td>
-    <td class="span2"><strong>V8 Version</strong></td>
-    <td class="span3" id="v8Version">{{ process.versions.v8 }}</td>
   </tr>
   <tr><td colspan="4">&nbsp;</td></tr>
   <tr>

@@ -62,11 +62,7 @@
 </nav>
 
 
-{% if settings.fullwidth_layout %}
-<div class="container-fluid">
-{% else %}  
 <div class="container">
-{% endif %}
   <div class="row">
     <div class="col-md-12">
       <div class="page-header main-title">
@@ -100,21 +96,17 @@
 
 <script src="{{ baseHref }}{{assets.vendor.js}}"></script>
 <script type="text/javascript">
-
+'use strict';
 window.ME_SETTINGS = {
   readOnly: '{{ !!settings.read_only }}' === 'true',
-  noDelete: '{{ !!settings.no_delete }}' === 'true',
   codeMirrorEditorTheme: '{{ editorTheme }}',
   baseHref: '{{ baseHref }}',
   collapsibleJSON: '{{ !!settings.me_collapsible_json }}' === 'true',
-  collapsibleJSONDefaultUnfold: Number.parseInt('{{ settings.me_collapsible_json_default_unfold || 0}}', 10),
+  collapsibleJSONDefaultUnfold: parseInt('{{ settings.me_collapsible_json_default_unfold || 0}}', 10),
   confirmDelete: '{{ !!settings.me_confirm_delete }}' === 'true',
   dbName: '{{ dbName | url_encode }}',
   collectionName: '{{ collectionName | url_encode }}',
-  bucketName: '{{ bucketName }}',
-  limit: '{{ limit }}',
-  skip: '{{ skip }}',
-  totalPages: Math.round('{{ count }}' / '{{ limit }}')
+  bucketName: '{{ bucketName }}'
 };
 </script>
 {% block scripts %}

@@ -62,12 +62,12 @@
 {% if document._id._bsontype == 'Binary' %}
 <form method="POST"
   id="documentEditForm"
-  action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}?subtype={{ document._id.sub_type }}&skip={{skip}}"
+  action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}?subtype={{ document._id.sub_type }}"
 >
 {% else %}
 <form method="POST"
   id="documentEditForm"
-  action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}?skip={{skip}}"
+  action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}"
 >
 {% endif %}
 
@@ -117,14 +117,9 @@
   </div>
 </form>
 
-{% if !settings.read_only && !settings.no_delete %}
+{% if !settings.read_only %}
   <br>
-
-  {% if document._id._bsontype == 'Binary' %}
-  <form method="POST" action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}?subtype={{ document._id.sub_type }}">
-  {% else %}
   <form method="POST" action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}">
-  {% endif %}
     <input type="hidden" name="_method" value="delete">
     <input type="submit" class="hidden" />
     <button class="btn btn-danger deleteButtonDocument">
