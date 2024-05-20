@@ -144,7 +144,7 @@
   </div>
   {% if !settings.read_only && !settings.no_delete && count > 0 %}
   <p>
-    <form id="deleteListForm" method="POST" style="display:inline;" action="{{ collectionUrl }}?key={{ key }}&value={{ value }}&type={{ type }}&query={{ query }}&projection={{ projection }}&runAggregate={{ runAggregate }}">
+    <form id="deleteListForm" method="POST" style="display:inline;" action="{{ collectionUrl }}?key={{ key }}&value={{ value }}&type={{ type }}&query={{ query|default('%7B%7D') }}&projection={{ projection }}&runAggregate={{ runAggregate }}">
       {# Router is smart enough to transform method=POST + _method=delete into actual HTTP DELETE, which is what we want #}
       <input type="hidden" name="_method" value="delete">
       <button type="button" data-toggle="modal" data-target="#deleteListModal" class="btn btn-danger btn-large btn-block">
